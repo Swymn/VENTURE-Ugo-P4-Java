@@ -14,19 +14,24 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.Date;
 
+@ExtendWith(MockitoExtension.class)
 class FareCalculatorServiceTest {
 
     private static FareCalculatorService fareCalculatorService;
+
+    @Mock
+    private static TicketDAO ticketDAO;
+
     private Ticket ticket;
 
     @BeforeAll
     public static void setUp() {
-        fareCalculatorService = new FareCalculatorService();
+        ticketDAO = new TicketDAO();
+        fareCalculatorService = new FareCalculatorService(ticketDAO);
     }
 
     @BeforeEach
@@ -196,6 +201,8 @@ class FareCalculatorServiceTest {
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(spot);
+
+        when(ticketDAO.getTicket("ABCDEF")).thenReturn(ticket);
 
         fareCalculatorService.calculateFare(ticket);
         assertEquals(Fare.CAR_RATE_PER_HOUR * 0.95, ticket.getPrice());

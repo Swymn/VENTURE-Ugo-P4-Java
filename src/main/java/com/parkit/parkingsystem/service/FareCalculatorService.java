@@ -6,10 +6,10 @@ import com.parkit.parkingsystem.model.Ticket;
 
 public class FareCalculatorService {
 
-    private final TicketDAO dao;
+    private TicketDAO dao;
 
-    public FareCalculatorService() {
-        this.dao = new TicketDAO();
+    public FareCalculatorService(TicketDAO ticketDAO) {
+        this.dao = ticketDAO;
     }
 
     public void calculateFare(Ticket ticket) {
@@ -42,7 +42,7 @@ public class FareCalculatorService {
         }
     }
 
-    private double getReductionFare(final Ticket ticket) {
+    private double getReductionFare(Ticket ticket) {
         if (dao.getTicket(ticket.getVehicleRegNumber()) != null) {
             return 0.95;
         }
