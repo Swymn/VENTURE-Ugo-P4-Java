@@ -6,7 +6,7 @@ import com.parkit.parkingsystem.model.Ticket;
 
 public class FareCalculatorService {
 
-    private TicketDAO dao;
+    private final TicketDAO dao;
 
     public FareCalculatorService(TicketDAO ticketDAO) {
         this.dao = ticketDAO;
