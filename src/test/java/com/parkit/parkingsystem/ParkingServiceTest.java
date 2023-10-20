@@ -59,15 +59,27 @@ class ParkingServiceTest {
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
     }
 
+    /**
+     * This test is not working because of the inputReaderUtil.readSelection()
+     * method and the parkingSpot.getNextAvailableSlot() method.
+     * <p>
+     * While mocking those methods, the test is not working with the stubbing error.
+     *
+     * @FIXME
+     */
     @Test
     void testProcessIncomingVehicle() {
-        // @FIXME Stubbing error here
         when(inputReaderUtil.readSelection()).thenReturn(1);
-        when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(1);
         parkingService.processIncomingVehicle();
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
     }
 
+    /**
+     * Same as the previous test,
+     * this one is not working because of PotentialStubbingProblem because of the mock inside this test and the setup.
+     *
+     * @FIXME
+     */
     @Test
     void processExitingVehicleTestUnableUpdate() {
         when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(false);
@@ -76,4 +88,32 @@ class ParkingServiceTest {
         verify(parkingSpotDAO, Mockito.times(0)).updateParking(any(ParkingSpot.class));
     }
 
+    /**
+     * This one isn't working either because of the inputReaderUtil.readSelection() method which given a wrong value (0).
+     *
+     * @FIXME
+     */
+    @Test
+    void testGetNextParkingNumberIfAvailable() {
+        when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(1);
+        parkingService.getNextParkingNumberIfAvailable();
+        verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSlot(any(ParkingType.class));
+    }
+
+    /**
+     * This one isn't working either because of the inputReaderUtil.readSelection() method which given a wrong value (0).
+     *
+     * @FIXME
+     */
+    @Test
+    void testGetNextParkingNumberIfAvailableParkingNotFound() {
+        when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(-1);
+        parkingService.getNextParkingNumberIfAvailable();
+        verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSlot(any(ParkingType.class));
+    }
+
+    @Test
+    void testGetNextParkingNumberIfAvailableParkingNumberWrongArgument() {
+        // TBD
+    }
 }
