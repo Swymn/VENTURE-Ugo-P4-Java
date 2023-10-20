@@ -61,7 +61,7 @@ class ParkingServiceTest {
 
     @Test
     void testProcessIncomingVehicle() {
-        // @FIXME ERROR HERE
+        // @FIXME Stubbing error here
         when(inputReaderUtil.readSelection()).thenReturn(1);
         when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(1);
         parkingService.processIncomingVehicle();
