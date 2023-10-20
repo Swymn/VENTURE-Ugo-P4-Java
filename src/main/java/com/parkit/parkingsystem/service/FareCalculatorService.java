@@ -12,7 +12,11 @@ public class FareCalculatorService {
         this.dao = ticketDAO;
     }
 
-    public void calculateFare(Ticket ticket) {
+    public void calculateFare(final Ticket ticket) {
+        calculateFare(ticket, true);
+    }
+
+    public void calculateFare(final Ticket ticket, final boolean discount) {
         if ((ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime()))) {
             throw new IllegalArgumentException("Out time provided is incorrect:" + ticket.getOutTime().toString());
         }
@@ -30,11 +34,11 @@ public class FareCalculatorService {
 
         switch (ticket.getParkingSpot().getParkingType()) {
             case CAR: {
-                ticket.setPrice((durationHours * Fare.CAR_RATE_PER_HOUR) * getReductionFare(ticket));
+                ticket.setPrice((durationHours * Fare.CAR_RATE_PER_HOUR) * getReductionFare(discount));
                 break;
             }
             case BIKE: {
-                ticket.setPrice((durationHours * Fare.BIKE_RATE_PER_HOUR) * getReductionFare(ticket));
+                ticket.setPrice((durationHours * Fare.BIKE_RATE_PER_HOUR) * getReductionFare(discount));
                 break;
             }
             default:
@@ -42,10 +46,7 @@ public class FareCalculatorService {
         }
     }
 
-    private double getReductionFare(Ticket ticket) {
-        if (dao.getTicket(ticket.getVehicleRegNumber()) != null) {
-            return 0.95;
-        }
-        return 1;
+    private double getReductionFare(final boolean discount) {
+        return discount ? 0.95 : 1;
     }
 }

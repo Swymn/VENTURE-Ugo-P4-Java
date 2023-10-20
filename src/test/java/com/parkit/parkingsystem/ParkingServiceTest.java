@@ -54,8 +54,25 @@ class ParkingServiceTest {
 
     @Test
     void processExitingVehicleTest() {
+        when(ticketDAO.getNbTicket(anyString())).thenReturn(1);
         parkingService.processExitingVehicle();
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
+    }
+
+    @Test
+    void testProcessIncomingVehicle() {
+        when(inputReaderUtil.readSelection()).thenReturn(1);
+        when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(1);
+        parkingService.processIncomingVehicle();
+        verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
+    }
+
+    @Test
+    void processExitingVehicleTestUnableUpdate() {
+        when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(false);
+        parkingService.processExitingVehicle();
+        verify(ticketDAO, Mockito.times(1)).updateTicket(any(Ticket.class));
+        verify(parkingSpotDAO, Mockito.times(0)).updateParking(any(ParkingSpot.class));
     }
 
 }
