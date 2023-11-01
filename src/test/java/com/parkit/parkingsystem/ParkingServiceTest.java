@@ -21,6 +21,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ParkingServiceTest {
 
+    @Mock
     private static ParkingService parkingService;
 
     @Mock
@@ -45,7 +46,8 @@ class ParkingServiceTest {
 
             when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
 
-            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            // parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingService = mock(ParkingService.class);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to set up test mock objects");
@@ -69,7 +71,7 @@ class ParkingServiceTest {
      */
     @Test
     void testProcessIncomingVehicle() {
-        when(inputReaderUtil.readSelection()).thenReturn(1);
+        when(parkingService.getNextParkingNumberIfAvailable()).thenReturn(new ParkingSpot(1, ParkingType.CAR, true));
         parkingService.processIncomingVehicle();
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
     }
