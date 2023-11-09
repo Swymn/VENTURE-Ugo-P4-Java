@@ -21,7 +21,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ParkingServiceTest {
 
-    @Mock
     private static ParkingService parkingService;
 
     @Mock
@@ -36,18 +35,9 @@ class ParkingServiceTest {
         try {
             when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
 
-            ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
-            Ticket ticket = new Ticket();
-            ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
-            ticket.setParkingSpot(parkingSpot);
-            ticket.setVehicleRegNumber("ABCDEF");
-            when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
-            when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
-
             when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
 
-            // parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-            parkingService = mock(ParkingService.class);
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to set up test mock objects");
@@ -56,24 +46,22 @@ class ParkingServiceTest {
 
     @Test
     void processExitingVehicleTest() {
-        when(ticketDAO.getNbTicket(anyString())).thenReturn(1);
+        when(ticketDAO.getTicket(anyString())).thenReturn(createFakeTicket());
+        when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
+
         parkingService.processExitingVehicle();
+
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
     }
 
-    /**
-     * This test is not working because of the inputReaderUtil.readSelection()
-     * method and the parkingSpot.getNextAvailableSlot() method.
-     * <p>
-     * While mocking those methods, the test is not working with the stubbing error.
-     *
-     * @FIXME
-     */
     @Test
     void testProcessIncomingVehicle() {
-        when(parkingService.getNextParkingNumberIfAvailable()).thenReturn(new ParkingSpot(1, ParkingType.CAR, true));
+        when(inputReaderUtil.readSelection()).thenReturn(1);
+        when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(2);
+
         parkingService.processIncomingVehicle();
-        verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
+        
+        verify(parkingSpotDAO, times(1)).getNextAvailableSlot(any(ParkingType.class));
     }
 
     /**
@@ -117,5 +105,14 @@ class ParkingServiceTest {
     @Test
     void testGetNextParkingNumberIfAvailableParkingNumberWrongArgument() {
         // TBD
+    }
+
+    private Ticket createFakeTicket() {
+        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
+        Ticket ticket = new Ticket();
+        ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
+        ticket.setParkingSpot(parkingSpot);
+        ticket.setVehicleRegNumber("ABCDEF");
+        return ticket;
     }
 }
