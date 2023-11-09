@@ -32,20 +32,12 @@ class ParkingServiceTest {
 
     @BeforeEach
     void setUpPerTest() {
-        try {
-            when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
-
-            when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
-
-            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to set up test mock objects");
-        }
+        parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
     }
 
     @Test
-    void processExitingVehicleTest() {
+    void processExitingVehicleTest() throws Exception {
+        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
         when(ticketDAO.getTicket(anyString())).thenReturn(createFakeTicket());
         when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
 
@@ -60,43 +52,31 @@ class ParkingServiceTest {
         when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(2);
 
         parkingService.processIncomingVehicle();
-        
+
         verify(parkingSpotDAO, times(1)).getNextAvailableSlot(any(ParkingType.class));
     }
 
-    /**
-     * Same as the previous test,
-     * this one is not working because of PotentialStubbingProblem because of the mock inside this test and the setup.
-     *
-     * @FIXME
-     */
     @Test
     void processExitingVehicleTestUnableUpdate() {
-        when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(false);
+        when(ticketDAO.getTicket(anyString())).thenReturn(createFakeTicket());
+        when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(false);
+
         parkingService.processExitingVehicle();
-        verify(ticketDAO, Mockito.times(1)).updateTicket(any(Ticket.class));
+
         verify(parkingSpotDAO, Mockito.times(0)).updateParking(any(ParkingSpot.class));
     }
 
-    /**
-     * This one isn't working either because of the inputReaderUtil.readSelection() method which given a wrong value (0).
-     *
-     * @FIXME
-     */
     @Test
     void testGetNextParkingNumberIfAvailable() {
+        when(inputReaderUtil.readSelection()).thenReturn(1);
         when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(1);
         parkingService.getNextParkingNumberIfAvailable();
         verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSlot(any(ParkingType.class));
     }
-
-    /**
-     * This one isn't working either because of the inputReaderUtil.readSelection() method which given a wrong value (0).
-     *
-     * @FIXME
-     */
+    
     @Test
     void testGetNextParkingNumberIfAvailableParkingNotFound() {
+        when(inputReaderUtil.readSelection()).thenReturn(1);
         when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(-1);
         parkingService.getNextParkingNumberIfAvailable();
         verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSlot(any(ParkingType.class));
