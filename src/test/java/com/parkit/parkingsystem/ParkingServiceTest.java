@@ -7,6 +7,7 @@ import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.service.ParkingService;
 import com.parkit.parkingsystem.util.InputReaderUtil;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -70,21 +71,27 @@ class ParkingServiceTest {
     void testGetNextParkingNumberIfAvailable() {
         when(inputReaderUtil.readSelection()).thenReturn(1);
         when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(1);
-        parkingService.getNextParkingNumberIfAvailable();
-        verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSlot(any(ParkingType.class));
+
+        final ParkingSpot spot = parkingService.getNextParkingNumberIfAvailable();
+        Assertions.assertNotNull(spot);
     }
-    
+
     @Test
     void testGetNextParkingNumberIfAvailableParkingNotFound() {
         when(inputReaderUtil.readSelection()).thenReturn(1);
         when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(-1);
-        parkingService.getNextParkingNumberIfAvailable();
-        verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSlot(any(ParkingType.class));
+
+        final ParkingSpot spot = parkingService.getNextParkingNumberIfAvailable();
+        Assertions.assertNull(spot);
     }
 
     @Test
     void testGetNextParkingNumberIfAvailableParkingNumberWrongArgument() {
-        // TBD
+        when(inputReaderUtil.readSelection()).thenReturn(1);
+        when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(0);
+
+        final ParkingSpot spot = parkingService.getNextParkingNumberIfAvailable();
+        Assertions.assertNull(spot);
     }
 
     private Ticket createFakeTicket() {
