@@ -37,8 +37,12 @@ class ParkingServiceTest {
     }
 
     @Test
-    void processExitingVehicleTest() throws Exception {
-        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+    void processExitingVehicleTest() {
+        try {
+            when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+        } catch (Exception ignored) {
+
+        }
         when(ticketDAO.getTicket(anyString())).thenReturn(createFakeTicket());
         when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
 
