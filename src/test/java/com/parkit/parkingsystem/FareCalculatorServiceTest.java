@@ -26,10 +26,17 @@ class FareCalculatorServiceTest {
 
     private Ticket ticket;
 
+    private static ParkingSpot parkingSpotCarNotAvailable;
+    private static ParkingSpot parkingSpotBikeNotAvailable;
+    private static ParkingSpot parkingSpotEmptyNotAvailable;
+
     @BeforeAll
     public static void setUp() {
         ticketDAO = mock(TicketDAO.class);
         fareCalculatorService = new FareCalculatorService(ticketDAO);
+        parkingSpotCarNotAvailable = new ParkingSpot(1, ParkingType.CAR, false);
+        parkingSpotBikeNotAvailable = new ParkingSpot(1, ParkingType.BIKE, false);
+        parkingSpotEmptyNotAvailable = new ParkingSpot(1, null, false);
     }
 
     @BeforeEach
@@ -42,11 +49,10 @@ class FareCalculatorServiceTest {
         Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (60 * 60 * 1000));
         Date outTime = new Date();
-        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
 
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
-        ticket.setParkingSpot(parkingSpot);
+        ticket.setParkingSpot(parkingSpotCarNotAvailable);
 
         when(ticketDAO.getTicket(ticket.getVehicleRegNumber())).thenReturn(null);
 
@@ -59,11 +65,11 @@ class FareCalculatorServiceTest {
         Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (60 * 60 * 1000));
         Date outTime = new Date();
-        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);
+
 
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
-        ticket.setParkingSpot(parkingSpot);
+        ticket.setParkingSpot(parkingSpotBikeNotAvailable);
 
         when(ticketDAO.getTicket(ticket.getVehicleRegNumber())).thenReturn(null);
 
@@ -76,11 +82,10 @@ class FareCalculatorServiceTest {
         Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (60 * 60 * 1000));
         Date outTime = new Date();
-        ParkingSpot parkingSpot = new ParkingSpot(1, null, false);
 
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
-        ticket.setParkingSpot(parkingSpot);
+        ticket.setParkingSpot(parkingSpotEmptyNotAvailable);
         assertThrows(NullPointerException.class, () -> fareCalculatorService.calculateFare(ticket, false));
     }
 
@@ -89,11 +94,10 @@ class FareCalculatorServiceTest {
         Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() + (60 * 60 * 1000));
         Date outTime = new Date();
-        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);
 
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
-        ticket.setParkingSpot(parkingSpot);
+        ticket.setParkingSpot(parkingSpotBikeNotAvailable);
         assertThrows(IllegalArgumentException.class, () -> fareCalculatorService.calculateFare(ticket, false));
     }
 
@@ -102,11 +106,10 @@ class FareCalculatorServiceTest {
         Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (45 * 60 * 1000));//45 minutes parking time should give 3/4th parking fare
         Date outTime = new Date();
-        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);
 
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
-        ticket.setParkingSpot(parkingSpot);
+        ticket.setParkingSpot(parkingSpotBikeNotAvailable);
 
         when(ticketDAO.getTicket(ticket.getVehicleRegNumber())).thenReturn(null);
 
@@ -119,11 +122,10 @@ class FareCalculatorServiceTest {
         Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (45 * 60 * 1000));//45 minutes parking time should give 3/4th parking fare
         Date outTime = new Date();
-        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
 
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
-        ticket.setParkingSpot(parkingSpot);
+        ticket.setParkingSpot(parkingSpotCarNotAvailable);
 
         when(ticketDAO.getTicket(ticket.getVehicleRegNumber())).thenReturn(null);
 
@@ -136,11 +138,10 @@ class FareCalculatorServiceTest {
         Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (24 * 60 * 60 * 1000));//24 hours parking time should give 24 * parking fare per hour
         Date outTime = new Date();
-        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
 
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
-        ticket.setParkingSpot(parkingSpot);
+        ticket.setParkingSpot(parkingSpotCarNotAvailable);
 
         when(ticketDAO.getTicket(ticket.getVehicleRegNumber())).thenReturn(null);
 
@@ -153,11 +154,10 @@ class FareCalculatorServiceTest {
         final Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (15 * 60 * 1000));
         final Date outTime = new Date();
-        final ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
 
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
-        ticket.setParkingSpot(parkingSpot);
+        ticket.setParkingSpot(parkingSpotCarNotAvailable);
         fareCalculatorService.calculateFare(ticket, false);
         assertEquals(0, ticket.getPrice());
     }
@@ -167,11 +167,10 @@ class FareCalculatorServiceTest {
         final Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (30 * 60 * 1000));
         final Date outTime = new Date();
-        final ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
 
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
-        ticket.setParkingSpot(parkingSpot);
+        ticket.setParkingSpot(parkingSpotCarNotAvailable);
         fareCalculatorService.calculateFare(ticket, false);
         assertEquals(0, ticket.getPrice());
     }
@@ -181,11 +180,10 @@ class FareCalculatorServiceTest {
         final Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (15 * 60 * 1000));
         final Date outTime = new Date();
-        final ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);
 
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
-        ticket.setParkingSpot(parkingSpot);
+        ticket.setParkingSpot(parkingSpotCarNotAvailable);
         fareCalculatorService.calculateFare(ticket, false);
         assertEquals(0, ticket.getPrice());
     }
@@ -195,11 +193,10 @@ class FareCalculatorServiceTest {
         final Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (30 * 60 * 1000));
         final Date outTime = new Date();
-        final ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);
 
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
-        ticket.setParkingSpot(parkingSpot);
+        ticket.setParkingSpot(parkingSpotBikeNotAvailable);
         fareCalculatorService.calculateFare(ticket, false);
         assertEquals(0, ticket.getPrice());
     }
@@ -209,11 +206,10 @@ class FareCalculatorServiceTest {
         final Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (60 * 60 * 1000));
         final Date outTime = new Date();
-        final ParkingSpot spot = new ParkingSpot(1, ParkingType.CAR, false);
 
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
-        ticket.setParkingSpot(spot);
+        ticket.setParkingSpot(parkingSpotCarNotAvailable);
 
         when(ticketDAO.getTicket(ticket.getVehicleRegNumber())).thenReturn(ticket);
 
@@ -226,11 +222,10 @@ class FareCalculatorServiceTest {
         final Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (60 * 60 * 1000));
         final Date outTime = new Date();
-        final ParkingSpot spot = new ParkingSpot(1, ParkingType.CAR, false);
 
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
-        ticket.setParkingSpot(spot);
+        ticket.setParkingSpot(parkingSpotCarNotAvailable);
 
         when(ticketDAO.getTicket(ticket.getVehicleRegNumber())).thenReturn(null);
 
@@ -243,11 +238,10 @@ class FareCalculatorServiceTest {
         final Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (60 * 60 * 1000));
         final Date outTime = new Date();
-        final ParkingSpot spot = new ParkingSpot(1, ParkingType.BIKE, false);
 
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
-        ticket.setParkingSpot(spot);
+        ticket.setParkingSpot(parkingSpotBikeNotAvailable);
 
         when(ticketDAO.getTicket(ticket.getVehicleRegNumber())).thenReturn(ticket);
 
@@ -260,11 +254,10 @@ class FareCalculatorServiceTest {
         final Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (60 * 60 * 1000));
         final Date outTime = new Date();
-        final ParkingSpot spot = new ParkingSpot(1, ParkingType.BIKE, false);
 
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
-        ticket.setParkingSpot(spot);
+        ticket.setParkingSpot(parkingSpotBikeNotAvailable);
 
         when(ticketDAO.getTicket(ticket.getVehicleRegNumber())).thenReturn(null);
 
