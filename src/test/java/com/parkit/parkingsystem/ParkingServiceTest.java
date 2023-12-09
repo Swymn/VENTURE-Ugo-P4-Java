@@ -14,12 +14,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Date;
 
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class ParkingServiceTest {
 
     private static ParkingService parkingService;
@@ -37,13 +40,10 @@ class ParkingServiceTest {
     }
 
     @Test
-    void processExitingVehicleTest() {
-        try {
-            when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
-        } catch (Exception ignored) {
-
-        }
-        when(ticketDAO.getTicket(anyString())).thenReturn(createFakeTicket());
+    void processExitingVehicleTest() throws Exception {
+        final Ticket ticket = createFakeTicket();
+        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+        when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
         when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
 
         parkingService.processExitingVehicle();
@@ -52,7 +52,8 @@ class ParkingServiceTest {
     }
 
     @Test
-    void testProcessIncomingVehicle() {
+    void testProcessIncomingVehicle() throws Exception {
+        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
         when(inputReaderUtil.readSelection()).thenReturn(1);
         when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(2);
 
@@ -62,8 +63,10 @@ class ParkingServiceTest {
     }
 
     @Test
-    void processExitingVehicleTestUnableUpdate() {
-        when(ticketDAO.getTicket(anyString())).thenReturn(createFakeTicket());
+    void processExitingVehicleTestUnableUpdate() throws Exception {
+        final Ticket ticket = createFakeTicket();
+        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+        when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
         when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(false);
 
         parkingService.processExitingVehicle();

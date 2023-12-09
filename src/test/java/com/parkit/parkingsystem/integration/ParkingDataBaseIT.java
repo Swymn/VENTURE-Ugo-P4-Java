@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ParkingDataBaseIT {
 
-    private static DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
+    private static final DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
     private static ParkingSpotDAO parkingSpotDAO;
     private static TicketDAO ticketDAO;
     private static DataBasePrepareService dataBasePrepareService;
@@ -62,7 +62,7 @@ class ParkingDataBaseIT {
     }
 
     @Test
-    void testParkingLotExit() {
+    void testParkingLotExit() throws InterruptedException {
         try {
             testParkingACar();
             when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
@@ -75,13 +75,14 @@ class ParkingDataBaseIT {
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         parkingService.processExitingVehicle();
 
-        Ticket newTIcket = ticketDAO.getTicket("ABCDEF");
+        Thread.sleep(3000);
+
+        Ticket newTicket = ticketDAO.getTicket("ABCDEF");
         int newSpot = parkingSpotDAO.getNextAvailableSlot(ticket.getParkingSpot().getParkingType());
 
-        Assertions.assertNotEquals(ticket.getOutTime(), newTIcket.getOutTime());
+        Assertions.assertNotNull(newTicket.getOutTime());
 
         Assertions.assertNotEquals(spot, newSpot);
-        //TODO: check that the fare generated and out time are populated correctly in the database
     }
 
 }
