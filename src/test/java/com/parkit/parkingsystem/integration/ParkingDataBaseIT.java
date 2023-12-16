@@ -75,7 +75,7 @@ class ParkingDataBaseIT {
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         parkingService.processExitingVehicle();
 
-        Thread.sleep(3000);
+        Thread.sleep(5000);
 
         Ticket newTicket = ticketDAO.getTicket("ABCDEF");
         int newSpot = parkingSpotDAO.getNextAvailableSlot(ticket.getParkingSpot().getParkingType());
